@@ -16,7 +16,7 @@ mkdir -p "$O"
 	-e DEBUG_INFO_BTF \
 	-e MODULE_ALLOW_BTF_MISMATCH \
 	-e MODULE_SIG_SHA256 -d MODULE_SIG_SHA1 \
-	--set-str LOCALVERSION "-salami.k618" -d LOCALVERSION_AUTO
+	--set-str LOCALVERSION "-xigua.k618" -d LOCALVERSION_AUTO
 "${M[@]}" olddefconfig >> "$O/../gki-config.log" 2>&1
 for c in MEMCG_V1 DEBUG_INFO_BTF MODULE_SIG_SHA256; do
 	grep -q "^CONFIG_$c=y" "$O/.config" || { echo "config_gki: CONFIG_$c did not take"; exit 1; }

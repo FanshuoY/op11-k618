@@ -3,7 +3,7 @@ name: build-m0
 on:
   push:
     branches: [main]
-    paths-ignore: ['README.md', 'LICENSE', 'device/**']
+    paths-ignore: ['README.md', 'LICENSE', 'device/**/*.md']
   workflow_dispatch:
 
 concurrency:
@@ -77,7 +77,7 @@ jobs:
       - name: Build GKI 6.18
         run: bash scripts/build_gki.sh
 
-      - name: Boot image (diagnostic)
+      - name: Boot image (diagnostic, PJA110)
         run: bash scripts/build_bootimg.sh
 
       - name: Save ccache
@@ -93,9 +93,12 @@ jobs:
           ccache -s || true
           mkdir -p dist
           cp out/gki/arch/arm64/boot/Image dist/ 2>/dev/null || true
+          cp out/Image-dtb dist/ 2>/dev/null || true
+          cp device/xigua/fdt.dtb dist/ 2>/dev/null || true
           cp out/gki/.config dist/gki.config 2>/dev/null || true
           cp out/gki/include/config/kernel.release dist/ 2>/dev/null || true
           cp out/diag-nolayer.img dist/ 2>/dev/null || true
+          cp out/avb.txt dist/ 2>/dev/null || true
           cp out/build.log dist/ 2>/dev/null || true
           cp out/gki-config.log dist/ 2>/dev/null || true
           df -h /
@@ -104,6 +107,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: op11-k618-m0-${{ github.run_number }}
+          name: pja110-k618-m0-${{ github.run_number }}
           path: dist/
           retention-days: 14

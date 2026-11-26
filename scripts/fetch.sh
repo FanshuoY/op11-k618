@@ -1,5 +1,5 @@
 #!/bin/bash
-# fetch.sh: the M0 inputs at pinned revisions (shallow). Idempotent.
+# fetch.sh: the M0.2 inputs at pinned revisions (shallow). Idempotent.
 set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
@@ -22,3 +22,5 @@ fetch() {
 fetch src/common https://android.googlesource.com/kernel/common ff4a6c3bb0f471a9dd186293a47b62c83829b97d
 # boot image tool (header v4)
 fetch src/mkbootimg https://android.googlesource.com/platform/system/tools/mkbootimg f5c284e8998dd8a085cf027bb518b6c2b84cf744
+# avbtool (Apache-2.0), pinned; used only to give the image a valid boot footer
+fetch src/avb https://github.com/LineageOS/android_external_avb 7cd928fb51baafc5117566744a57230a048bae04
