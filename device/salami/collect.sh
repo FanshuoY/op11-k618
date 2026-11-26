@@ -30,6 +30,14 @@ echo "" >> "$OUT"
 say "--- reserved-memory children"
 ls /proc/device-tree/reserved-memory >> "$OUT" 2>/dev/null
 
+sec fdt
+if [ -r /sys/firmware/fdt ]; then
+	cp /sys/firmware/fdt /sdcard/fdt.dtb 2>/dev/null || cat /sys/firmware/fdt > /sdcard/fdt.dtb
+	say "fdt -> /sdcard/fdt.dtb ($(stat -c %s /sdcard/fdt.dtb 2>/dev/null) bytes)"
+else
+	say "/sys/firmware/fdt not readable"
+fi
+
 sec ramoops
 R=/proc/device-tree/reserved-memory/ramoops_region
 if [ -d "$R" ]; then
