@@ -1,1 +1,1 @@
-console=ttyMSM0,115200n8 loglevel=7 panic=5 ramoops.mem_address=0xe4400000 ramoops.mem_size=0x240000 ramoops.console_size=0x40000 ramoops.pmsg_size=0x200000 ramoops.mem_type=1
+console=ttyMSM0,115200n8 loglevel=7 panic=5 ramoops.mem_address=0xe4400000 ramoops.mem_size=0x300000 ramoops.record_size=0x40000 ramoops.console_size=0x40000 ramoops.pmsg_size=0x200000 ramoops.max_reason=4 ramoops.mem_type=1
