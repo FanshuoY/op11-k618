@@ -1,0 +1,7 @@
+/src/
+/out/
+/toolchain/
+/.ccache/
+*.img
+*.ko
+*.log
