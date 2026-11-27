@@ -28,6 +28,19 @@ jobs:
           rm -rf mm/oplus_mm
           cp -a sm8550-modules/vendor/oplus/kernel/mm mm/oplus_mm
           ls -l mm/oplus_mm/Kconfig
+          python3 - <<'PY'
+          import glob, os, re
+          for kcfg in glob.glob('**/Kconfig', recursive=True):
+              lines = open(kcfg, encoding='utf-8', errors='ignore').readlines()
+              out = []
+              for line in lines:
+                  m = re.match(r'\s*source\s+"([^"]+)"', line)
+                  if m and not os.path.exists(m.group(1)):
+                      print(f'drop missing source in {kcfg}: {m.group(1)}')
+                      continue
+                  out.append(line)
+              open(kcfg, 'w', encoding='utf-8').writelines(out)
+          PY
           git log -1 --oneline | tee source.commit.txt
 
       - name: Install build dependencies
