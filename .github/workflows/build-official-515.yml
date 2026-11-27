@@ -67,6 +67,9 @@ jobs:
           set -o pipefail
           make O=out ARCH=arm64 LLVM=1 gki_defconfig 2>&1 | tee build.log
           scripts/kconfig/merge_config.sh -m -O out out/.config arch/arm64/configs/kalama_le_gki.fragment 2>&1 | tee -a build.log
+          echo 'CONFIG_64BIT=y' >> out/.config
+          echo 'CONFIG_ARM64_USE_LSE_ATOMICS=y' >> out/.config
+          grep -E 'CONFIG_64BIT|CONFIG_ARM64' out/.config | head -20 | tee -a build.log
           make O=out ARCH=arm64 LLVM=1 olddefconfig 2>&1 | tee -a build.log
           make O=out ARCH=arm64 LLVM=1 -j"$(nproc)" Image 2>&1 | tee -a build.log
 
