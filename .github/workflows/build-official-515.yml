@@ -86,7 +86,7 @@ jobs:
           open(p, 'w', encoding='utf-8').write(new)
           PY
           make O=out ARCH=arm64 LLVM=1 olddefconfig 2>&1 | tee -a build.log
-          make O=out ARCH=arm64 LLVM=1 -j"$(nproc)" Image 2>&1 | tee -a build.log
+          timeout 1800 stdbuf -oL -eL make O=out ARCH=arm64 LLVM=1 -j"$(nproc)" Image 2>&1 | tee -a build.log
 
       - name: Build modules
         working-directory: kernel
