@@ -1,0 +1,60 @@
+name: build-official-515
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout OnePlus official Ace 2 Pro Android 16 kernel
+        run: |
+          git clone --depth 1 \
+            --branch 'oneplus/sm8550_b_16.0.0_ace_2_pro' \
+            https://github.com/OnePlusOSS/android_kernel_oneplus_sm8550.git kernel
+          cd kernel
+          git log -1 --oneline | tee source.commit.txt
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison flex libssl-dev libelf-dev \
+            clang-14 lld-14 llvm-14
+
+      - name: Configure and build Image
+        working-directory: kernel
+        run: |
+          set -o pipefail
+          make O=out ARCH=arm64 LLVM=-14 gki_defconfig 2>&1 | tee build.log
+          scripts/kconfig/merge_config.sh -m -O out out/.config arch/arm64/configs/kalama_le_gki.fragment 2>&1 | tee -a build.log
+          make O=out ARCH=arm64 LLVM=-14 olddefconfig 2>&1 | tee -a build.log
+          make O=out ARCH=arm64 LLVM=-14 -j"$(nproc)" Image 2>&1 | tee -a build.log
+
+      - name: Build modules
+        working-directory: kernel
+        continue-on-error: true
+        run: |
+          make O=out ARCH=arm64 LLVM=-14 -j"$(nproc)" modules 2>&1 | tee -a build.log
+
+      - name: Collect artifacts
+        working-directory: kernel
+        run: |
+          mkdir -p ../official-515
+          cp out/arch/arm64/boot/Image ../official-515/Image
+          cp out/.config ../official-515/gki.config
+          cp build.log ../official-515/build.log
+          cp source.commit.txt ../official-515/source.commit.txt
+          if [ -d out ]; then
+            find out -maxdepth 2 -name '*.ko' -print | head -n 20 > ../official-515/modules.list || true
+          fi
+          ls -lh ../official-515
+
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: pja110-official-515
+          path: official-515
+          if-no-files-found: error
