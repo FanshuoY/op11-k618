@@ -18,7 +18,7 @@ jobs:
             --branch 'oneplus/sm8550_b_16.0.0_ace_2_pro' \
             https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8550.git kernel/sm8550-modules
           cd kernel
-          ln -sfn sm8550-modules/oplus/kernel/cpu kernel/oplus_cpu
+          ln -sfn sm8550-modules/vendor/oplus/kernel/cpu kernel/oplus_cpu
           git log -1 --oneline | tee source.commit.txt
 
       - name: Install build dependencies
