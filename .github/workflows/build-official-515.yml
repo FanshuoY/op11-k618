@@ -70,6 +70,21 @@ jobs:
           echo 'CONFIG_64BIT=y' >> out/.config
           echo 'CONFIG_ARM64_USE_LSE_ATOMICS=y' >> out/.config
           grep -E 'CONFIG_64BIT|CONFIG_ARM64' out/.config | head -20 | tee -a build.log
+          python3 - <<'PY'
+          import re
+          p = 'include/linux/types.h'
+          s = open(p, encoding='utf-8', errors='ignore').read()
+          new = re.sub(
+              r'#ifdef CONFIG_64BIT\s*\ntypedef struct \{\s*\n\ts64 counter;\s*\n\} atomic64_t;\s*\n#endif',
+              'typedef struct {\n\ts64 counter;\n} atomic64_t;',
+              s,
+          )
+          if new == s:
+              print('types.h atomic64 guard not matched')
+          else:
+              print('types.h atomic64 guard removed')
+          open(p, 'w', encoding='utf-8').write(new)
+          PY
           make O=out ARCH=arm64 LLVM=1 olddefconfig 2>&1 | tee -a build.log
           make O=out ARCH=arm64 LLVM=1 -j"$(nproc)" Image 2>&1 | tee -a build.log
 
