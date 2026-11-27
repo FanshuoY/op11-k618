@@ -24,20 +24,31 @@ jobs:
             bc bison flex libssl-dev libelf-dev \
             clang-14 lld-14 llvm-14
 
+      - name: Make LLVM tools available as default names
+        run: |
+          sudo ln -sf /usr/bin/clang-14 /usr/local/bin/clang
+          sudo ln -sf /usr/bin/ld.lld-14 /usr/local/bin/ld.lld
+          sudo ln -sf /usr/bin/llvm-ar-14 /usr/local/bin/llvm-ar
+          sudo ln -sf /usr/bin/llvm-nm-14 /usr/local/bin/llvm-nm
+          sudo ln -sf /usr/bin/llvm-objcopy-14 /usr/local/bin/llvm-objcopy
+          sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
+          sudo ln -sf /usr/bin/llvm-readelf-14 /usr/local/bin/llvm-readelf
+          sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
+
       - name: Configure and build Image
         working-directory: kernel
         run: |
           set -o pipefail
-          make O=out ARCH=arm64 LLVM=-14 gki_defconfig 2>&1 | tee build.log
+          make O=out ARCH=arm64 LLVM=1 gki_defconfig 2>&1 | tee build.log
           scripts/kconfig/merge_config.sh -m -O out out/.config arch/arm64/configs/kalama_le_gki.fragment 2>&1 | tee -a build.log
-          make O=out ARCH=arm64 LLVM=-14 olddefconfig 2>&1 | tee -a build.log
-          make O=out ARCH=arm64 LLVM=-14 -j"$(nproc)" Image 2>&1 | tee -a build.log
+          make O=out ARCH=arm64 LLVM=1 olddefconfig 2>&1 | tee -a build.log
+          make O=out ARCH=arm64 LLVM=1 -j"$(nproc)" Image 2>&1 | tee -a build.log
 
       - name: Build modules
         working-directory: kernel
         continue-on-error: true
         run: |
-          make O=out ARCH=arm64 LLVM=-14 -j"$(nproc)" modules 2>&1 | tee -a build.log
+          make O=out ARCH=arm64 LLVM=1 -j"$(nproc)" modules 2>&1 | tee -a build.log
 
       - name: Collect artifacts
         working-directory: kernel
@@ -47,9 +58,6 @@ jobs:
           cp out/.config ../official-515/gki.config
           cp build.log ../official-515/build.log
           cp source.commit.txt ../official-515/source.commit.txt
-          if [ -d out ]; then
-            find out -maxdepth 2 -name '*.ko' -print | head -n 20 > ../official-515/modules.list || true
-          fi
           ls -lh ../official-515
 
       - name: Upload Image
