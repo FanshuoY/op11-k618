@@ -25,6 +25,9 @@ jobs:
           rm -rf kernel/locking/oplus_locking
           mkdir -p kernel/locking/oplus_locking
           printf '# stub: oplus_locking Kconfig is not present in the public source drop\n' > kernel/locking/oplus_locking/Kconfig
+          rm -rf mm/oplus_mm
+          cp -a sm8550-modules/vendor/oplus/kernel/mm mm/oplus_mm
+          ls -l mm/oplus_mm/Kconfig
           git log -1 --oneline | tee source.commit.txt
 
       - name: Install build dependencies
