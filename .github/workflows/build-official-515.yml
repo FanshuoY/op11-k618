@@ -19,9 +19,9 @@ jobs:
             https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8550.git kernel/sm8550-modules
           cd kernel
           rm -rf kernel/oplus_cpu
-          mkdir -p kernel/oplus_cpu/thermal
-          cp -a sm8550-modules/vendor/oplus/kernel/cpu/thermal/. kernel/oplus_cpu/thermal/
-          ls -l kernel/oplus_cpu/thermal/Kconfig
+          mkdir -p kernel/oplus_cpu
+          cp -a sm8550-modules/vendor/oplus/kernel/cpu/. kernel/oplus_cpu/
+          ls -l kernel/oplus_cpu/thermal/Kconfig kernel/oplus_cpu/sched/Kconfig
           git log -1 --oneline | tee source.commit.txt
 
       - name: Install build dependencies
